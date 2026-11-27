@@ -1,0 +1,114 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test-and-compose-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    env:
+      COMPOSE_PROJECT_NAME: rag-ci-${{ github.run_id }}-${{ github.run_attempt }}
+      WEB_PORT: "5000"
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Install dependencies
+        run: python -m pip install -r requirements.txt
+
+      - name: Run unit tests and syntax/import checks
+        run: |
+          python -m unittest discover -s tests -v
+          python -m compileall -q app.py rag tests
+          python -c "import app, rag.config, rag.ingestion, rag.ollama_client, rag.rag_service, rag.vector_store"
+
+      - name: Validate isolated Compose configuration
+        run: docker compose -f compose.yaml -f compose.ci.yaml config --quiet
+
+      - name: Build application image
+        run: docker compose -f compose.yaml -f compose.ci.yaml build rag-web
+
+      - name: Start mock-only Compose stack
+        run: docker compose -f compose.yaml -f compose.ci.yaml up -d --no-build
+
+      - name: Verify health, re-index, ask, and Chroma persistence
+        timeout-minutes: 8
+        shell: bash
+        run: |
+          set -euo pipefail
+          base_url="http://127.0.0.1:${WEB_PORT}"
+
+          wait_for_health() {
+            local require_index="$1"
+            local attempt body
+            for attempt in $(seq 1 90); do
+              body="$(curl --silent --show-error --fail --max-time 3 "${base_url}/health" 2>/dev/null || true)"
+              if [ -n "$body" ] && HEALTH_BODY="$body" REQUIRE_INDEX="$require_index" python -c '
+          import json, os
+          health = json.loads(os.environ["HEALTH_BODY"])
+          assert health.get("status") == "ok"
+          assert health.get("ollama") == "available"
+          assert "ci-smoke.txt" in health.get("files", [])
+          if os.environ["REQUIRE_INDEX"] == "1":
+              assert health.get("index_status") == "ready"
+              assert health.get("chunks_indexed", 0) > 0
+          ' >/dev/null 2>&1; then
+                echo "Health check passed (index_required=${require_index})."
+                return 0
+              fi
+              sleep 1
+            done
+            echo "Timed out waiting for /health." >&2
+            return 1
+          }
+
+          verify_ask() {
+            local response
+            response="$(curl --silent --show-error --fail --max-time 30 \
+              -H 'Content-Type: application/json' \
+              -d '{"question":"What does the CI fixture verify?"}' \
+              "${base_url}/ask")"
+            ASK_RESPONSE="$response" python -c '
+          import json, os
+          result = json.loads(os.environ["ASK_RESPONSE"])
+          citation = "ci-smoke.txt (Chunk #1)"
+          assert result.get("mode") == "qa"
+          assert result.get("chunks_used", 0) > 0
+          assert citation in result.get("sources", [])
+          assert citation in result.get("answer", "")
+          '
+            echo "Ask response and citation contract passed."
+          }
+
+          wait_for_health 0
+          reindex="$(curl --silent --show-error --fail --max-time 30 \
+            -X POST "${base_url}/reindex")"
+          REINDEX_RESPONSE="$reindex" python -c '
+          import json, os
+          result = json.loads(os.environ["REINDEX_RESPONSE"])
+          assert result.get("files_count") == 1
+          assert result.get("chunks_indexed", 0) > 0
+          '
+          echo "Re-index passed."
+          verify_ask
+
+          docker compose -f compose.yaml -f compose.ci.yaml restart rag-web
+          wait_for_health 1
+          verify_ask
+
+      - name: Clean up uniquely scoped Compose project and volumes
+        if: always()
+        timeout-minutes: 2
+        run: docker compose -f compose.yaml -f compose.ci.yaml down --volumes --remove-orphans --timeout 10

@@ -1,0 +1,59 @@
+# Imran Ali
+**Software Quality Assurance (SQA) Engineer / Trainee**
+
+- **Location:** Lahore, Pakistan
+- **Email:** imranalik062@gmail.com
+- **Phone:** 03042352476
+- **LinkedIn:** Imran Ali
+- **GitHub:** Imran-ali355
+
+---
+
+## Summary
+BS Software Engineering graduate currently working as an SQA Trainee at PITB, with a focused interest in Software Quality Assurance and test automation. Hands-on exposure to manual testing, test case design, SDLC/STLC fundamentals, SQL, C#, and Selenium WebDriver using the Page Object Model (POM). Familiar with XPath, automated test execution, data-driven testing, defect-oriented thinking, and database validation. Analytical, detail-oriented, and motivated to build reliable, maintainable, and high-quality software through structured testing and continuous learning.
+
+---
+
+## Professional Experience
+
+### Software Quality Assurance (SQA) Trainee
+**PITB** | *07/2026 – Present* | *Lahore, Pakistan*
+- Developed detailed test scenarios and managed test cases via AIO Tests, reducing manual regression testing time by 3 hours per sprint for improved team efficiency.
+- Executed comprehensive manual and functional testing within an Agile framework, identifying 12 critical defects and contributing to a 97% software release quality.
+
+---
+
+## Education
+- **BS Software Engineering** — **Superior University**, Lahore *(2020 – 2024)*
+
+---
+
+## Skills
+- **Software Testing:** Manual Testing, Test Case Design, Bug Reporting, SDLC, STLC
+- **Programming:** C#, Python, Object-Oriented Programming (OOP) fundamentals
+- **Database Testing:** SQL, Joins, Filters, Subqueries, Data Validation
+- **CI/CD:** Jenkins, Docker
+- **Test Automation:** Selenium, Playwright
+- **API Testing:** Postman
+- **Performance Testing:** JMeter
+- **Tools:** Jira, Postman, C#, Visual Studio, Selenium, Git/GitHub
+
+---
+
+## Certifications
+- **MERN Stack** — Digital Direction
+- **Agile Project Management** — Coursera
+
+---
+
+## Projects
+
+### Adactin Hotel Management Automation
+- Automated login, hotel search, room selection, booking, form submission, and confirmation-detail validation using Selenium WebDriver with C# and Playwright with TypeScript.
+- Applied Page Object Model (POM), XPath and CSS selectors, assertions, reusable test methods, and positive and negative test scenarios.
+- Created and maintained automation scripts in Visual Studio.
+
+### DemoQA Web Application Automation
+- Automated DemoQA workflows using Selenium WebDriver with C# and Playwright with TypeScript.
+- Implemented Page Object Model (POM), XPath and CSS selectors, assertions, reusable test methods, and positive and negative test scenarios.
+- Executed automated validations in Visual Studio.

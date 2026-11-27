@@ -1,0 +1,1 @@
+This CI fixture provides deterministic smoke-test evidence for checking indexed retrieval and Chroma persistence after the web container restarts.

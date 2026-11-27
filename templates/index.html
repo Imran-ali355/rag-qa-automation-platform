@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Agentic QA & RAG Platform</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --surface: #1e293b;
+      --surface-2: #0b1220;
+      --border: #334155;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --primary: #3b82f6;
+      --primary-hover: #2563eb;
+      --success: #10b981;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+    }
+    .container {
+      max-width: 980px;
+      margin: 28px auto;
+      padding: 0 18px;
+    }
+    .header {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .title h1 {
+      margin: 0;
+      font-size: 1.45rem;
+      letter-spacing: -0.02em;
+    }
+    .title p {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    .status-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .pill {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .pill strong { color: var(--text); }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+    }
+    .mode-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+    .tab-btn {
+      background: var(--surface-2);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.15s;
+    }
+    .tab-btn.active {
+      background: var(--primary);
+      color: #fff;
+      border-color: var(--primary);
+    }
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .chip {
+      background: rgba(59, 130, 246, 0.12);
+      color: #93c5fd;
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
+    .chip:hover { background: rgba(59, 130, 246, 0.22); }
+    textarea {
+      width: 100%;
+      min-height: 92px;
+      padding: 12px;
+      font-size: 0.95rem;
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      resize: vertical;
+      font-family: inherit;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .btn {
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn:hover { background: var(--primary-hover); }
+    .btn:disabled { opacity: 0.6; cursor: not-allowed; }
+    .btn-secondary {
+      background: var(--surface-2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+    .btn-secondary:hover { border-color: var(--muted); background: #162033; }
+    .output-area { margin-top: 20px; }
+    .answer-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--primary);
+      border-radius: 8px;
+      padding: 16px;
+      white-space: pre-wrap;
+    }
+    .sources-bar {
+      margin-top: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    .source-tag {
+      background: #172554;
+      color: #bfdbfe;
+      padding: 3px 8px;
+      border-radius: 4px;
+      border: 1px solid #1d4ed8;
+    }
+    .tc-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--surface-2);
+      border-radius: 8px;
+      overflow: hidden;
+      font-size: 0.88rem;
+    }
+    th, td {
+      padding: 10px 12px;
+      border: 1px solid var(--border);
+      text-align: left;
+      vertical-align: top;
+    }
+    th { background: #162033; color: #cbd5e1; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-Positive { background: rgba(16, 185, 129, 0.18); color: #6ee7b7; }
+    .badge-Negative { background: rgba(239, 68, 68, 0.18); color: #fca5a5; }
+    .badge-Boundary { background: rgba(245, 158, 11, 0.18); color: #fcd34d; }
+    ol.steps { margin: 0; padding-left: 18px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="title">
+        <h1>Agentic QA & RAG Studio</h1>
+        <p>Local Document Q&A and Grounded QA Test Case Generator (Ollama + ChromaDB)</p>
+      </div>
+      <div class="status-bar">
+        <span class="pill" id="modelPill">Model: <strong>loading...</strong></span>
+        <span class="pill" id="indexPill">Indexed: <strong>...</strong></span>
+        <button class="btn btn-secondary" onclick="reindexDocs()" id="reindexBtn">Re-index Docs</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="mode-tabs">
+        <button class="tab-btn active" id="tabQa" onclick="setMode('qa')">Document Q&A</button>
+        <button class="tab-btn" id="tabTc" onclick="setMode('test_cases')">QA Test Case Generator</button>
+      </div>
+
+      <div class="chips" id="sampleChips"></div>
+
+      <textarea id="question" placeholder="Ask a question about your documents..."></textarea>
+
+      <div class="actions">
+        <span style="font-size: 0.82rem; color: var(--muted);" id="modeHint">
+          Answers are grounded only in supported TXT/DOCX files inside <code>docs/</code>, with source citations.
+        </span>
+        <button class="btn" id="sendBtn" onclick="runQuery()">Ask Question</button>
+      </div>
+
+      <div class="output-area" id="outputArea" style="display: none;"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentMode = "qa";
+    let lastTestCases = [];
+
+    const SAMPLES = {
+      qa: [
+        "Summarize the key skills and automation projects",
+        "What tools and CI/CD pipelines are mentioned?",
+        "List all technical experience details"
+      ],
+      test_cases: [
+        "Generate Positive, Negative, and Boundary test cases for user login & authentication",
+        "Generate functional test cases for the main workflow described in the docs",
+        "Generate API and validation test cases based on the requirements"
+      ]
+    };
+
+    function setMode(mode) {
+      currentMode = mode;
+      document.getElementById("tabQa").classList.toggle("active", mode === "qa");
+      document.getElementById("tabTc").classList.toggle("active", mode === "test_cases");
+
+      const textarea = document.getElementById("question");
+      const sendBtn = document.getElementById("sendBtn");
+      const hint = document.getElementById("modeHint");
+
+      if (mode === "qa") {
+        textarea.placeholder = "Ask a question about your documents...";
+        sendBtn.textContent = "Ask Question";
+        hint.innerHTML = "Answers use supported TXT/DOCX files inside <code>docs/</code> with source citations.";
+      } else {
+        textarea.placeholder = "Describe the feature/requirement from docs/ to generate structured QA test cases...";
+        sendBtn.textContent = "Generate Test Cases";
+        hint.innerHTML = "Generates documented Positive, Negative & Boundary test cases with JSON export.";
+      }
+      renderChips();
+    }
+
+    function renderChips() {
+      const container = document.getElementById("sampleChips");
+      container.innerHTML = "";
+      SAMPLES[currentMode].forEach(text => {
+        const btn = document.createElement("button");
+        btn.className = "chip";
+        btn.type = "button";
+        btn.textContent = text;
+        btn.onclick = () => { document.getElementById("question").value = text; };
+        container.appendChild(btn);
+      });
+    }
+
+    async function loadHealth() {
+      try {
+        const res = await fetch("/health");
+        const data = await res.json();
+        document.getElementById("modelPill").innerHTML = `Status: <strong>${escapeHtml(data.status)}</strong> | Model: <strong>${escapeHtml(data.chat_model)}</strong>`;
+        document.getElementById("indexPill").innerHTML = `Files: <strong>${escapeHtml(data.files_count)}</strong> | Chunks: <strong>${escapeHtml(data.chunks_indexed)}</strong>`;
+      } catch (e) {
+        document.getElementById("modelPill").textContent = "Status: Offline";
+      }
+    }
+
+    async function reindexDocs() {
+      const btn = document.getElementById("reindexBtn");
+      btn.disabled = true;
+      btn.textContent = "Indexing...";
+      try {
+        const res = await fetch("/reindex", { method: "POST" });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error?.message || "Re-index failed.");
+        await loadHealth();
+      } catch (e) {
+        window.alert(e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Re-index Docs";
+      }
+    }
+
+    function downloadJSON() {
+      const blob = new Blob([JSON.stringify(lastTestCases, null, 2)], { type: "application/json" });
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "rag-generated-test-cases.json";
+      a.click();
+    }
+
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+    }
+
+    async function runQuery() {
+      const question = document.getElementById("question").value.trim();
+      if (!question) return;
+
+      const btn = document.getElementById("sendBtn");
+      const out = document.getElementById("outputArea");
+      btn.disabled = true;
+      out.style.display = "block";
+      out.innerHTML = `<div class="answer-box">Running local Ollama RAG pipeline...</div>`;
+
+      try {
+        const res = await fetch("/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, mode: currentMode })
+        });
+        const data = await res.json();
+
+        if (!res.ok || data.error) {
+          const message = typeof data.error === "string" ? data.error : data.error?.message;
+          out.innerHTML = `<div class="answer-box" style="border-left-color: var(--danger);">Error: ${escapeHtml(message || "Request failed.")}</div>`;
+          return;
+        }
+
+        const sourcesHtml = (data.sources || [])
+          .map(s => `<span class="source-tag">${escapeHtml(s)}</span>`)
+          .join("");
+
+        if (data.mode === "test_cases") {
+          lastTestCases = data.test_cases || [];
+          const rows = lastTestCases.map(tc => {
+            const steps = Array.isArray(tc.steps)
+              ? `<ol class="steps">${tc.steps.map(st => `<li>${escapeHtml(st)}</li>`).join("")}</ol>`
+              : escapeHtml(tc.steps);
+            const badgeClass = `badge-${escapeHtml(tc.type || "Positive")}`;
+            return `
+              <tr>
+                <td><strong>${escapeHtml(tc.id)}</strong></td>
+                <td>${escapeHtml(tc.title)}</td>
+                <td><span class="badge ${badgeClass}">${escapeHtml(tc.type)}</span></td>
+                <td>${escapeHtml(tc.preconditions)}</td>
+                <td>${steps}</td>
+                <td>${escapeHtml(tc.expected_result)}</td>
+                <td><span class="source-tag">${escapeHtml(tc.source_ref)}</span></td>
+              </tr>
+            `;
+          }).join("");
+
+          out.innerHTML = `
+            <div class="tc-toolbar">
+              <strong>Generated Test Cases (${lastTestCases.length})</strong>
+              <button class="btn btn-secondary" onclick="downloadJSON()">Export JSON</button>
+            </div>
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Title</th>
+                  <th>Type</th>
+                  <th>Preconditions</th>
+                  <th>Steps</th>
+                  <th>Expected Result</th>
+                  <th>Source</th>
+                </tr>
+              </thead>
+              <tbody>${rows || `<tr><td colspan="7">${escapeHtml(data.message || "No test cases returned. Try refining the prompt.")}</td></tr>`}</tbody>
+            </table>
+            <div class="sources-bar"><span>Retrieved Context:</span> ${sourcesHtml}</div>
+          `;
+        } else {
+          out.innerHTML = `
+            <div class="answer-box">${escapeHtml(data.answer || data.message || "No answer was returned.")}</div>
+            <div class="sources-bar"><span>Retrieved Context:</span> ${sourcesHtml}</div>
+          `;
+        }
+      } catch (err) {
+        out.innerHTML = `<div class="answer-box" style="border-left-color: var(--danger);">Network error: ${escapeHtml(err.message)}</div>`;
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    renderChips();
+    loadHealth();
+  </script>
+</body>
+</html>

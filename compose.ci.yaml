@@ -1,0 +1,27 @@
+services:
+  rag-web:
+    environment:
+      DOCS_DIR: /app/docs
+      OLLAMA_BASE_URL: http://ollama:11434
+    volumes:
+      - ./tests/fixtures:/app/docs:ro
+    depends_on:
+      ollama:
+        condition: service_healthy
+
+  ollama:
+    image: python:3.11-slim
+    command: ["python", "-u", "/opt/ollama_stub.py"]
+    volumes:
+      - ./tests/support/ollama_stub.py:/opt/ollama_stub.py:ro
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:11434/api/tags', timeout=2)"
+      interval: 2s
+      timeout: 3s
+      retries: 20
+      start_period: 2s
+    restart: "no"
