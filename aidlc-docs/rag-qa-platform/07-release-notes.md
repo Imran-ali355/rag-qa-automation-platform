@@ -1,8 +1,11 @@
 # Stage 7 — Release Notes & Sign-off Package
 
 **Work item:** Local Ollama + ChromaDB RAG QA Platform (`rag-web`)  
-**Release version recommendation:** `0.1.0-rc.1` after the outstanding release gates below are completed. This is a proposal only; no existing release version, tag, branch, or commit could be verified because this workspace is not a Git repository.  
-**Release decision:** **Recommendation: NO-GO for general release at this time.** Stage 6 materially improved verification, but key real-model, production-Compose, and UI scenarios remain unverified. A human release owner must make the final decision.
+**Git repository:** [https://github.com/Imran-ali355/rag-qa-automation-platform.git](https://github.com/Imran-ali355/rag-qa-automation-platform.git)  
+**Branch:** `main` (provided by the project owner; not verifiable from this non-Git workspace)  
+**Release version recommendation:** `0.1.0-rc.1` for future general release after outstanding gates below are completed. No existing tag, commit, or image version could be verified.  
+**Local/demo sign-off:** **Approved by the user on 2026-11-27 for local/demo use only.** This does not constitute production or general-release approval.  
+**General-release decision:** **Recommendation: NO-GO at this time.** Stage 6 materially improved verification, but key real-model, production-Compose, and UI scenarios remain unverified.
 
 ## Release Summary & Highlights
 
@@ -98,7 +101,7 @@ The Stage 3 traceability matrix also references `CIT-001–CIT-008`, `VAL-001–
 - **Supported formats:** Direct-child `.txt` and validated `.docx` files are supported; PDF and recursive discovery are not. Invalid supported documents can block re-index promotion.
 - **No-answer documentation conflict:** Stage 1 AC-01 and one Stage 2 sentence contradict the clarified HTTP 200 behavior; see above.
 - **Backup and state:** ChromaDB and Ollama model data are separate persistent volumes. No production backup/restore procedure or known-good prior image/tag was validated. A successful re-index replaces the active collection; rollback of application code alone does not restore a prior index.
-- **Repository/documentation state:** The workspace is not a Git repository, so branch, commit, tag, and clean/dirty status cannot be reported. A recursive README search found no `README.md`; `.env.example` does exist. No README was created as part of Stage 7.
+- **Repository/documentation state:** The user-provided repository URL and `main` branch are recorded above, but this workspace is not a Git repository, so remote, branch, commit, tag, and clean/dirty state cannot be verified. A root `README.md` was created with local Compose, model-pull, re-index, API, test, and Ollama configuration instructions; `.env.example` remains the configuration template.
 - **Source-control secret hygiene:** A root `.gitignore` now excludes `.env` and `.env.*` while explicitly allowing `.env.example`; it also excludes Python caches/virtual environments and the local ChromaDB directory. `.dockerignore` separately excludes env files from image build context. No `.env` file is present. Because this workspace is not a Git repository, Git's ignore matching and tracked-file status could not be verified.
 
 ### Rollback steps
@@ -133,11 +136,12 @@ The Stage 3 traceability matrix also references `CIT-001–CIT-008`, `VAL-001–
 
 ### Final human sign-off
 
-- [ ] **Decision:** Human release owner selects Go, conditional Go, or No-Go; this document's recommendation is not authorization.
+- [x] **Local/demo decision:** User approved local/demo use on 2026-11-27. This approval excludes general production release.
+- [ ] **General-release decision:** Human release owner selects Go, conditional Go, or No-Go after outstanding release gates; this document's recommendation is not production authorization.
 - [ ] **Accepted scope:** Confirm this is a local/trusted-network MVP with no authentication, supported TXT/DOCX only, and no claim of validated model quality until real-model tests pass.
 - [ ] **Open risks:** Explicitly accept or block release on each outstanding validation item and the empty-index documentation inconsistency.
 - [ ] **Operations:** Confirm model pulls, volume persistence/backup, trusted Ollama endpoint, network restrictions, runbook, and rollback owner.
 - [ ] **Release identity:** Approve a version/image identifier and source revision through the authorized repository/release process; none is verified in this workspace.
-- [ ] **Approval record:** Name, role, decision, date/time, conditions, and any accepted exceptions: ______________________________
+- [x] **Approval record:** User approval recorded for local/demo use, dated 2026-11-27; general-release approval remains pending.
 
-**Stage 7 action:** Release package prepared only. No deployment, GitHub Actions run, merge, release, commit, or edits to artifacts 01–06 were performed. Stop here for final human sign-off.
+**Stage 7 action:** README and release sign-off notes prepared. Local/demo approval is recorded; no deployment, GitHub Actions run, merge, release, commit, or edits to artifacts 01–06 were performed.
